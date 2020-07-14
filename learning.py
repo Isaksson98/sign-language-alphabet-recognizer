@@ -46,19 +46,19 @@ def evaluate(history):
     plt.plot(history.history['accuracy'], label='Training accuracy')
     plt.plot(history.history['val_accuracy'], label='Validation accuracy')
     plt.legend(loc='lower right')
-    plt.savefig('C:/Users/Filip/Code/DeepLearning/sign-language-alphabet-recognizer/plots/accuracy11.png')
+    plt.savefig('C:/Users/Filip/Code/DeepLearning/sign-language-alphabet-recognizer/plots/accuracy14.png')
     plt.show()
 
     plt.ylabel('Loss')
     plt.plot(history.history['loss'], label='Training Loss')
     plt.plot(history.history['val_loss'], label='Validation Loss')
     plt.legend(loc='upper right')
-    plt.savefig('C:/Users/Filip/Code/DeepLearning/sign-language-alphabet-recognizer/plots/loss11.png')
+    plt.savefig('C:/Users/Filip/Code/DeepLearning/sign-language-alphabet-recognizer/plots/loss14.png')
 
 from sklearn.model_selection import train_test_split
 
-BATCH_SIZE = 64 #32
-EPOCHS = 15
+BATCH_SIZE = 32 #128 Effect of batch size
+EPOCHS = 20
 
 def create_network():
     num_of_classes = 29
@@ -67,28 +67,18 @@ def create_network():
     model.add(Conv2D(filters=32, kernel_size=(3,3), input_shape=(40,40,1), activation='relu'))
     model.add(Conv2D(filters=32, kernel_size=(3,3), input_shape=(40,40,1), activation='relu'))
     model.add(BatchNormalization())
-    #model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2,2)))
     model.add(Dropout(0.5))
 
     model.add(Conv2D(filters=64, kernel_size=(3,3), padding='same', activation='relu'))
     model.add(Conv2D(filters=64, kernel_size=(3,3), padding='same', activation='relu'))
     model.add(BatchNormalization())
-    #model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2,2)))
     model.add(Dropout(0.5))
-
-    #model.add(Conv2D(filters=128, kernel_size=(3,3), padding='same'))
-    #model.add(Conv2D(filters=128, kernel_size=(3,3), padding='same'))
-    #model.add(BatchNormalization())
-    #model.add(Activation('relu'))
-    #model.add(MaxPooling2D(pool_size=(2,2)))
-    #model.add(Dropout(0.25))
 
     model.add(Conv2D(filters=128, kernel_size=(3,3), padding='same', activation='relu'))
     model.add(Conv2D(filters=128, kernel_size=(3,3), padding='same', activation='relu'))
     model.add(BatchNormalization())
-    #model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2,2)))
     model.add(Dropout(0.5))
 
@@ -96,17 +86,17 @@ def create_network():
 
     model.add(Dense(units=256, activation='relu'))
     model.add(BatchNormalization())
-    #model.add(Activation('relu'))
     model.add(Dropout(0.5))
     
-    model.add(Dense(units=128, activation='relu'))
-    model.add(BatchNormalization())
+    #model.add(Dense(units=128, activation='relu'))
+    #model.add(BatchNormalization())
     #model.add(Activation('relu'))
-    model.add(Dropout(0.5))
+    #model.add(Dropout(0.5))
 
     model.add(Dense(units=num_of_classes, activation='softmax'))
 
     adamOpti = Adam(lr = 0.0001) # Default lr = 0.0001
+    #Effect of learning rate?
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
     print(model.summary())
@@ -117,9 +107,12 @@ model = create_network()
 
 training_set_generator = ImageDataGenerator(rescale = 1./255,
                                             validation_split=0.2,
-                                            zoom_range = 0.2,
+                                            zoom_range = 0.3,
                                             rotation_range=10,
-                                            #shear_range=0.2,
+                                            width_shift_range=0.2,
+                                            height_shift_range=0.2,
+                                            shear_range=0.2,
+                                            fill_mode='nearest'
                                             )
 
 training_set = training_set_generator.flow_from_directory('C:/Users/Filip/Code/DeepLearning/Datasets/SignLanguage/train',
